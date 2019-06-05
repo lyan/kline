@@ -541,7 +541,7 @@ export class ChartManager {
     updateData(dsName, data) {
         let ds = this.getDataSource(dsName);
         if (ds === undefined || ds === null) {
-            return;
+            return false;
         }
         if (data !== undefined && data !== null) {
             if (!ds.update(data)) {

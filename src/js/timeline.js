@@ -198,12 +198,19 @@ export class Timeline extends NamedObject {
         let oldMaxIndex = this._maxIndex;
         this._maxIndex = ds.getDataCount();
         switch (ds.getUpdateMode()) {
+            case DataSource.UpdateMode.Update:
             case DataSource.UpdateMode.Refresh:
-                if (this._maxIndex < 1)
-                    this._firstIndex = -1;
-                else
-                    this._firstIndex = Math.max(this._maxIndex - this._maxItemCount, 0);
-                this._selectedIndex = -1;
+                let selelcted_index = this.getSelectedIndex();
+                if(selelcted_index >=0){
+                    this._selectedIndex = selelcted_index;
+                    this.validateSelectedIndex();
+                }else {
+                    if (this._maxIndex < 1)
+                        this._firstIndex = -1;
+                    else
+                        this._firstIndex = Math.max(this._maxIndex - this._maxItemCount, 0);
+                    this._selectedIndex = -1;
+                }
                 this._updated = true;
                 break;
             case DataSource.UpdateMode.Append:

@@ -102,48 +102,49 @@ export class MainDataSource extends DataSource {
             let lastIndex = len - 1;
             let lastItem = this._dataItems[lastIndex];
             let e, i, cnt = data.length;
+            let flag = false;
             for (i = 0; i < cnt; i++) {
                 e = data[i];
-                if (e[0] === lastItem.date) {
-                    if (lastItem.open === e[1] &&
-                        lastItem.high === e[2] &&
-                        lastItem.low === e[3] &&
-                        lastItem.close === e[4] &&
-                        lastItem.volume === e[5]) {
-                        this.setUpdateMode(DataSource.UpdateMode.DoNothing);
-                    } else {
-                        this.setUpdateMode(DataSource.UpdateMode.Update);
-                        this._dataItems[lastIndex] = {
+                if (e[0] === lastItem.date && lastItem.open === e[1] &&
+                    lastItem.high === e[2] &&
+                    lastItem.low === e[3] &&
+                    lastItem.close === e[4] &&
+                    lastItem.volume === e[5]) {
+                    // this.setUpdateMode(DataSource.UpdateMode.DoNothing);
+                }else if(e[0] === lastItem.date){
+                    this._dataItems[lastIndex] = {
+                        date: e[0],
+                        open: e[1],
+                        high: e[2],
+                        low: e[3],
+                        close: e[4],
+                        volume: e[5]
+                    };
+                    flag = true;
+                }
+                else {
+                    // this.setUpdateMode(DataSource.UpdateMode.Update);
+                    if(e[0] > lastItem.date) {
+                        this._dataItems.push({
                             date: e[0],
                             open: e[1],
                             high: e[2],
                             low: e[3],
                             close: e[4],
                             volume: e[5]
-                        };
-                        this._updatedCount++;
+                        });
+                        flag = true;
                     }
-                    i++;
-                    if (i < cnt) {
-                        this.setUpdateMode(DataSource.UpdateMode.Append);
-                        for (; i < cnt; i++, this._appendedCount++) {
-                            e = data[i];
-                            this._dataItems.push({
-                                date: e[0],
-                                open: e[1],
-                                high: e[2],
-                                low: e[3],
-                                close: e[4],
-                                volume: e[5]
-                            });
-                        }
-                    }
-                    return true;
+                    this._updatedCount++;
                 }
             }
-            if (cnt < Kline.instance.limit) {
+            if(flag === false){
+                // 如果数据完全一致，则不接受推送
                 this.setUpdateMode(DataSource.UpdateMode.DoNothing);
                 return false;
+            }else{
+                this.setUpdateMode(DataSource.UpdateMode.Refresh);
+                return true;
             }
         }
         this.setUpdateMode(DataSource.UpdateMode.Refresh);

@@ -126,6 +126,7 @@ export class Control {
                     }, Kline.instance.intervalTime);
                 },
                 complete: function () {
+                    $("#chart_loading").removeClass("activated");
                     Kline.instance.G_HTTP_REQUEST = null;
                 }
             })
@@ -133,6 +134,7 @@ export class Control {
     }
 
     static requestSuccessHandler(res) {
+        $("#chart_loading").removeClass("activated");
         if (Kline.instance.debug) {
             console.log(res);
         }
@@ -144,7 +146,6 @@ export class Control {
             }
             return;
         }
-        $("#chart_loading").removeClass("activated");
 
         let chart = ChartManager.instance.getChart();
         chart.setTitle();
